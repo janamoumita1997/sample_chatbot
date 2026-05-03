@@ -2,7 +2,8 @@ from langgraph.graph import StateGraph,START,END
 from typing import TypedDict,Annotated
 from pydantic import BaseModel,Field
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.chat_models import ChatOllama
+# from langchain_community.chat_models import ChatOlama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -38,7 +39,7 @@ def get_existing_thread():
 
 # config = {"configurable":{"thread_id":"1"}}
 # initial_state = {
-#         "messages":[HumanMessage(content="hello, My name is Moumita Jana")]
+#         "messages":[HumanMessage(content="hi")]
 #     }
 # res = chatbot.invoke( initial_state,config=config)
 # ai_message = res['messages'][-1].content 
@@ -49,4 +50,3 @@ def get_existing_thread():
 # for message_chunk,metadata in chatbot.stream(initial_state,config=config,stream_mode="messages"):
 #     if message_chunk.content:
 #         print(message_chunk.content,end=" ",flush = True)
-

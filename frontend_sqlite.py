@@ -76,3 +76,5 @@ if user_input:
             message_chunk.content for message_chunk, metadata in chatbot.stream(initial_state,config= config,stream_mode="messages")
         )
     st.session_state['message_history'].append({"role":"assistance","content":ai_message})
+
+
