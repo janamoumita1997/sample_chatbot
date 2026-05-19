@@ -1,18 +1,13 @@
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter   
+from langchain_text_splitters import RecursiveCharacterTextSplitter  
+from langchain_community.vectorstores import FAISS 
+from langchain_ollama import OllamaEmbeddings
 import os,re
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 pdf_path = os.path.join(current_dir, "jesc101.pdf")
-loader = PyPDFLoader(pdf_path)
-docs = loader.load()
-# print(docs)
-
-# splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, separators=["\n\n", "\n", " ", ""])
-
-# chunks = splitter.split_documents(docs)
-# print(chunks)
+index_path = os.path.join(current_dir,"faiss_index")
 
 def chunk_book(text, chunk_size=500, chunk_overlap=50):
 
@@ -38,4 +33,21 @@ def chunk_book(text, chunk_size=500, chunk_overlap=50):
             # small section → keep as one chunk
             final_chunks.append(section)
 
-    return final_chunks
+    return sections
+
+def prepare_vectorstore():
+    
+    embeddings = OllamaEmbeddings(model="nomic-embed-text")
+
+    if os.path.exists(index_path):
+        return FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
+    
+    loader = PyPDFLoader(pdf_path)
+    docs = loader.load()
+    text = '\n '.join([doc.page_content for doc in docs])
+    chunks = chunk_book(text, chunk_size=1200, chunk_overlap=100)
+    vectorstore = FAISS.from_texts(chunks, embeddings)
+    vectorstore.save_local(index_path)
+
+    return vectorstore
+
